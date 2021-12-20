@@ -1,7 +1,8 @@
 const inquirer = require('inquirer');
 const Manager = require('./lib/Manager.js');
-//const Intern = require('./Intern.js');
+const Intern = require('./lib/Intern.js');
 const Engineer = require('./lib/Engineer.js');
+const writeFile = require('./lib/Page.js');
 
 
 const employeeInfo = [];
@@ -171,11 +172,99 @@ function addEngineer() {
 }
 
 function addIntern() {
-    console.log('Intern added!');
-
-    addEmployee();
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'internName',
+                message: "What is the intern's name (required)?",
+                validate: internName => {
+                    if(internName) {
+                        return true;
+                    }
+                    else {
+                        console.log("Please enter the intern's name (required)");
+                        return false;
+                    }
+                }
+            },
+            {
+                type: 'input',
+                name: 'internId',
+                message: "What is the intern's id number (required)?",
+                validate: internId => {
+                    if(internId) {
+                        return true;
+                    }
+                    else {
+                        console.log("What is the intern's id number (required)?");
+                        return false;
+                    }
+                }
+            },
+            {
+                type: 'input',
+                name: 'internEmail',
+                message: "What is the intern's email address(required)?",
+                validate: internEmail => {
+                    if(internEmail) {
+                        return true;
+                    }
+                    else {
+                        console.log("Please enter the intern's email addresss (required)");
+                        return false;
+                    }
+                }
+            },
+            {
+                type: 'input',
+                name: 'internSchool',
+                message: "What school does the intern attend (required)?",
+                validate: internSchool => {
+                    if(internSchool) {
+                        return true;
+                    }
+                    else {
+                        console.log("Please enter the school that intern attands (required)");
+                        return false;
+                    }
+                }
+            }
+        ])
+        .then((internAnswer) => {
+            console.log(internAnswer.internSchool);
+            const intern = new Intern(internAnswer.internName, internAnswer.internId, internAnswer.internEmail, internAnswer.internSchool);
+            employeeInfo.push(intern);
+            console.log('Intern added!');
+            addEmployee();
+        }) 
 }
 
 function buildHTML() {
-    console.log('Your page is complete!')
+        const pageContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+    
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
+            <title>Employee organizer</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css"/>
+        </head>
+
+        <body class="hero is-fullheight">
+            <header class="level column is-full has-background-danger has-text-black is-narrow">
+                <h1 class="level-item has-text-centered title is-1 mx-auto">Employee Organizer</h1>
+            </header>
+
+            <main class="level mb-auto mx-auto mt-6">
+                <h2 class=" level-item has-background-info mx-2" style="width: 250px; height: 125px;">Funny</h2>
+                <h2 class=" level-item has-background-info mx-2" style="width: 250px; height: 125px;">Funny</h2>
+            </main>
+        </body>
+        </html>
+        `;
+
+    writeFile(pageContent);
 }
