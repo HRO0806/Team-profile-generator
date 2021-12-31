@@ -1,12 +1,15 @@
 const inquirer = require('inquirer');
+const fs = require('fs')
 const Manager = require('./lib/Manager.js');
 const Intern = require('./lib/Intern.js');
 const Engineer = require('./lib/Engineer.js');
 const writeFile = require('./lib/Page.js');
 
-
 const employeeInfo = [];
 
+const worker = [
+
+]
 
 addManager();
 
@@ -30,7 +33,7 @@ function addManager() {
             {
                 type: 'input',
                 name: 'managerId',
-                message: 'What is the employee ID number of the manager (required)?',
+                message: 'What is the ID number of the manager (required)?',
                 validate: managerId => {
                     if (managerId) {
                         return true;
@@ -70,10 +73,19 @@ function addManager() {
                 }
             }
         ]).then((responses) => {
-            console.log(responses.managerOffice)
             const manager = new Manager(responses.managerName, responses.managerId, responses.managerEmail, responses.managerOffice)
-            employeeInfo.push(manager)
-            addEmployee()
+            employeeInfo.push(manager);
+
+            const managerCard = `
+            <div class="has-background-info">
+                <h2 class="mt-1 has-text-centered is-underlined has-text-black" style="font-size: 23px;">Manager</h2>
+                <div class="pl-3">
+                    <p class="has-text-black" style="width: 250px;">Name: ${responses.managerName}<br> ID: ${responses.managerId}<br> Email: <a class="has-text-black" href="mailto:${responses.managerEmail}">${responses.managerEmail}</a><br> Office Number: ${responses.managerOffice}</p>
+                </div>
+            </div>     
+            `
+            worker.push(managerCard);
+            addEmployee();
         })
 }
 
@@ -97,7 +109,7 @@ function addEmployee() {
                 addIntern();
             }
             else {
-                buildHTML();
+                buildHTML(worker);
             }
         })
 }
@@ -122,13 +134,13 @@ function addEngineer() {
             {
                 type: 'input',
                 name: 'engineerId',
-                message: 'What is the employee id of the manager (required)?',
+                message: 'What is the employee id of the Engineer (required)?',
                 validate: engineerId => {
                     if(engineerId) {
                         return true;
                     }
                     else {
-                        console.log("Please enter the employee id of the manager");
+                        console.log("Please enter the employee id of the engineer");
                         return false;
                     }
                 }
@@ -167,6 +179,15 @@ function addEngineer() {
             const engineer = new Engineer(promptAnswer.engineerName, promptAnswer.engineerId, promptAnswer.engineerEmail, promptAnswer.engineerGithub);
             employeeInfo.push(engineer);
             console.log('Engineer added!');
+            const engineerCard = `
+            <div class="has-background-info">
+                <h2 class="mt-1 has-text-centered is-underlined has-text-black" style="font-size: 23px;">Engineer</h2>
+                <div class="pl-3">
+                    <p class="has-text-black" style="width: 250px;">Name: ${promptAnswer.engineerName}<br> ID: ${promptAnswer.engineerId}<br> Email: <a class="has-text-black" href="mailto:${promptAnswer.engineerEmail}">${promptAnswer.engineerEmail}</a><br> GitHub: <a target="_none" class="has-text-black" href="https://github.com/${promptAnswer.engineerGithub}">${promptAnswer.engineerGithub}</p>
+                </div>
+            </div>
+            `
+            worker.push(engineerCard);
             addEmployee();
         })
 }
@@ -236,12 +257,21 @@ function addIntern() {
             const intern = new Intern(internAnswer.internName, internAnswer.internId, internAnswer.internEmail, internAnswer.internSchool);
             employeeInfo.push(intern);
             console.log('Intern added!');
+            const internCard = `
+            <div class="has-background-info" style="padding-top: .5px;">
+                <h2 class="mt-1 has-text-centered is-underlined has-text-black" style="font-size: 23px;">Intern</h2>
+                <div class="pl-3">
+                    <p class="has-text-black" style="width: 250px;">Name: ${internAnswer.internName}<br> ID: ${internAnswer.internId}<br> Email: <a class="has-text-black" href="mailto:${internAnswer.internEmail}">${internAnswer.internEmail}</a><br> School: ${internAnswer.internSchool}
+                </div>
+            </div>
+            `
+            worker.push(internCard)
             addEmployee();
         }) 
 }
 
-function buildHTML() {
-        const pageContent = `
+function buildHTML(workerType) {
+        let pageContent = `
         <!DOCTYPE html>
         <html lang="en">
     
@@ -259,12 +289,10 @@ function buildHTML() {
             </header>
 
             <main class="level mb-auto mx-auto mt-6">
-                <h2 class=" level-item has-background-info mx-2" style="width: 250px; height: 125px;">Funny</h2>
-                <h2 class=" level-item has-background-info mx-2" style="width: 250px; height: 125px;">Funny</h2>
+                ${workerType}
             </main>
         </body>
         </html>
         `;
-
     writeFile(pageContent);
 }
